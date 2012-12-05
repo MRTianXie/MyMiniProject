@@ -21,8 +21,17 @@ public class QuestionEditor extends JFrame{
 		MatchingPanel matchingPan = new MatchingPanel();
 		tabPan.add("Matching", matchingPan);
 		
+		NumericalPanel numericalPan = new NumericalPanel();
+		tabPan.add("Numerical", numericalPan);
+		
+		ShortAnswerPanel shortAnswerPan = new ShortAnswerPanel();
+		tabPan.add("Short Answer", shortAnswerPan);
+		
+		MissingWordPanel missingWordPan = new MissingWordPanel();
+		tabPan.add("Missing Word", missingWordPan);
+		
 		setContentPane(tabPan);
-		setSize(800, 400);
+		setSize(800, 420);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 	}

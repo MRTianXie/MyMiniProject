@@ -2,17 +2,27 @@ package miniProject;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Scanner;
 
 import javax.swing.*;
 
 import net.miginfocom.swing.MigLayout;
 
 public class MissingWordPanel extends JPanel {
+	
+	private String title = null;
+	private PrintWriter output;
+	private File myText;
+	
 	public MissingWordPanel() {
 		super(new MigLayout("filly","[][grow]"));
 		
 		add(new JLabel("Question Title (optional) "), "right");
-		JTextArea txtTitle = new JTextArea(2, 8);
+		final JTextArea txtTitle = new JTextArea(2, 8);
 		JScrollPane scroll1 = new JScrollPane(txtTitle);
 		scroll1.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scroll1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -48,7 +58,7 @@ public class MissingWordPanel extends JPanel {
 		final JCheckBox checkBoxE = new JCheckBox("Delete");
 		add(checkBoxE, "sg 2, wrap, right");
 		
-		add(new JLabel("Wrong Answer in Blank Line"), "right");
+		add(new JLabel("Second Part of the Sentence"), "right");
 		final MyTextArea secondSentence = new MyTextArea("F");
 		add(secondSentence, "growx, split, sg 1, span");
 		final JCheckBox checkBoxF = new JCheckBox("Delete");
@@ -88,6 +98,81 @@ public class MissingWordPanel extends JPanel {
 				if(checkBoxF.isSelected() == true){
 					secondSentence.setAreaText("");
 				}
+			}
+		});
+		
+		myText = new File("test.txt");
+		if(!myText.exists()) {
+			try {
+				myText.createNewFile();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				StringBuilder sb = new StringBuilder();
+				String firstStc = firstSentence.getAreaText();
+				String correctAns = correctAnswer.getAreaText();
+				String wrongAns1 = wrongAnswer1.getAreaText();
+				String wrongAns2 = wrongAnswer2.getAreaText();
+				String wrongAns3 = wrongAnswer3.getAreaText();
+				String secondStc = secondSentence.getAreaText();
+				
+				try {
+					Scanner input = new Scanner(myText);
+					while(input.hasNext()) {
+						sb.append(input.nextLine() + "\n");
+					}
+				} catch (FileNotFoundException e2) {
+					e2.printStackTrace();
+				}
+				
+				title = txtTitle.getText();
+				if(!(title.equals(""))) {
+					sb.append("\n::" + title + ":: ");
+				}else sb.append("\n");
+				
+				sb.append(firstStc + " {\n");
+				sb.append("=" + correctAns);
+				if(!(wrongAns1.equals(""))) {
+					sb.append("\n~" + wrongAns1);
+				}
+				if(!(wrongAns2.equals(""))) {
+					sb.append("\n~" + wrongAns2);
+				}
+				if(!(wrongAns3.equals(""))) {
+					sb.append("\n~" + wrongAns3);
+				}
+				sb.append("\n}" + secondStc);
+				
+				try {
+					output = new PrintWriter(myText);
+					output.append(sb.toString());
+					output.close();
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		btnNew.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				txtTitle.setText("");
+				title = "";
+				firstSentence.setAreaText("");
+				correctAnswer.setAreaText("");
+				wrongAnswer1.setAreaText("");
+				wrongAnswer2.setAreaText("");
+				wrongAnswer3.setAreaText("");
+				secondSentence.setAreaText("");
+				checkBoxA.setSelected(false);
+				checkBoxB.setSelected(false);
+				checkBoxC.setSelected(false);
+				checkBoxD.setSelected(false);
+				checkBoxE.setSelected(false);
+				checkBoxF.setSelected(false);
 			}
 		});
 	}

@@ -3,17 +3,25 @@ package miniProject;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
+import java.util.Scanner;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import net.miginfocom.swing.MigLayout;
 
 public class TrueFalsePanel extends JPanel{
 	
-	public TrueFalsePanel() {
+	private String title = null;
+	private String question = null;
+	private String answer = "F";
+	private PrintWriter output;
+	private File myText;
+	
+	public TrueFalsePanel() throws Exception{
 		super(new MigLayout("filly","[][grow][]"));
 		
 		add(new JLabel("Question Title (optional) "), "right");
-		JTextArea txtTitle = new JTextArea(2, 8);
+		final JTextArea txtTitle = new JTextArea(2, 8);
 		JScrollPane scroll1 = new JScrollPane(txtTitle);
 		scroll1.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scroll1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -27,9 +35,9 @@ public class TrueFalsePanel extends JPanel{
 		add(scroll2, "span, growx, wrap");
 		
 		JPanel answerPan = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		JRadioButton btnTrue = new JRadioButton("True");
-		JRadioButton btnFalse = new JRadioButton("False");
-		ButtonGroup group = new ButtonGroup();
+		final JRadioButton btnTrue = new JRadioButton("True");
+		final JRadioButton btnFalse = new JRadioButton("False");
+		final ButtonGroup group = new ButtonGroup();
 		group.add(btnTrue);
 		group.add(btnFalse);
 		answerPan.add(btnTrue);
@@ -51,6 +59,65 @@ public class TrueFalsePanel extends JPanel{
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){
 				txtQuestion.setText("");
+				txtTitle.setText("");
+			}
+		});
+		
+		myText = new File("test.txt");
+		if(!myText.exists()) {
+			try {
+				myText.createNewFile();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				StringBuilder sb = new StringBuilder();
+				
+				try {
+					Scanner input = new Scanner(myText);
+					while(input.hasNext()) {
+						sb.append(input.nextLine() + "\n");
+					}
+				} catch (FileNotFoundException e2) {
+					e2.printStackTrace();
+				}
+				
+				title = txtTitle.getText();
+				if(!(title.equals(""))) {
+					sb.append("\n::" + title + ":: ");
+				}else sb.append("\n");
+				question = txtQuestion.getText();
+				sb.append(question + " ");
+				
+				if(btnTrue.isSelected()) {
+					answer = "T";
+				}
+				
+				sb.append("{" +answer + "}\n");
+				
+				try {
+					output = new PrintWriter(myText);
+					output.append(sb.toString());
+					output.close();
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		btnNew.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				txtQuestion.setText("");
+				txtTitle.setText("");
+				answer = "F";
+				title = "";
+				question = "";
+				btnTrue.setSelected(false);
+				btnFalse.setSelected(false);
+				group.clearSelection();
 			}
 		});
 	}

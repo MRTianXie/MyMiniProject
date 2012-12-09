@@ -6,20 +6,28 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Scanner;
 
 import javax.swing.*;
 
 import net.miginfocom.swing.MigLayout;
 
 public class NumericalPanel extends JPanel {
-	private int percentage = 100;
 	private final int MAX = 100;
+	private String title = null;
+	private String question = null;
+	private PrintWriter output;
+	private File myText;
 	
 	public NumericalPanel() {
 		super(new MigLayout("filly","[][grow][]"));
 		
 		add(new JLabel("Question Title (optional) "), "right");
-		JTextArea txtTitle = new JTextArea(2, 8);
+		final JTextArea txtTitle = new JTextArea(2, 8);
 		JScrollPane scroll1 = new JScrollPane(txtTitle);
 		scroll1.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scroll1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -36,14 +44,14 @@ public class NumericalPanel extends JPanel {
 		add(btnClear, "skip 2, wrap, right");
 		
 		add(new JLabel("Add Correct Answer"), "right");
-		JTextArea txtAnswer = new JTextArea(1, 8);
+		final JTextArea txtAnswer = new JTextArea(1, 8);
 		JScrollPane scroll3 = new JScrollPane(txtAnswer);
 		scroll3.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scroll3.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		add(scroll3, "span, growx, wrap");
 		
 		add(new JLabel("Error Margin"), "right");
-		JTextArea txtMargin = new JTextArea(1, 4);
+		final JTextArea txtMargin = new JTextArea(1, 4);
 		CreditPanel marginPan = new CreditPanel(txtMargin);
 		add(marginPan, "wrap");
 		
@@ -56,6 +64,60 @@ public class NumericalPanel extends JPanel {
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){
 				txtQuestion.setText("");
+				txtTitle.setText("");
+			}
+		});
+		
+		myText = new File("test.txt");
+		if(!myText.exists()) {
+			try {
+				myText.createNewFile();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				StringBuilder sb = new StringBuilder();
+				String answer = txtAnswer.getText();
+				String margin = txtMargin.getText();
+				
+				try {
+					Scanner input = new Scanner(myText);
+					while(input.hasNext()) {
+						sb.append(input.nextLine() + "\n");
+					}
+				} catch (FileNotFoundException e2) {
+					e2.printStackTrace();
+				}
+				
+				title = txtTitle.getText();
+				if(!(title.equals(""))) {
+					sb.append("\n::" + title + ":: ");
+				}else sb.append("\n");
+				question = txtQuestion.getText();
+				sb.append(question + " {#");
+				sb.append(answer + ":" + margin + "}\n");
+				
+				try {
+					output = new PrintWriter(myText);
+					output.append(sb.toString());
+					output.close();
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		btnNew.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				txtQuestion.setText("");
+				txtTitle.setText("");
+				title = "";
+				question = "";
+				txtMargin.setText("0");
+				txtAnswer.setText("");
 			}
 		});
 	}
@@ -63,7 +125,7 @@ public class NumericalPanel extends JPanel {
 	private class CreditPanel extends JScrollPane {
 		public CreditPanel(final JTextArea jta) {
 			super(jta);
-			jta.setText(percentage + "%");
+			jta.setText("0");
 			this.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 			this.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 			

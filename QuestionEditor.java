@@ -34,6 +34,12 @@ public class QuestionEditor extends JFrame{
 		MissingWordPanel missingWordPan = new MissingWordPanel();
 		tabPan.add("Missing Word", missingWordPan);
 		
+		EssayPanel essayPan = new EssayPanel();
+		tabPan.add("Essay", essayPan);
+		
+		DescriptionPanel descritionPan = new DescriptionPanel();
+		tabPan.add("Description", descritionPan);
+		
 		File myText = new File("test.txt");
 		if(!myText.exists()) {
 			try {

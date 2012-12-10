@@ -136,7 +136,7 @@ public class MatchingPanel extends JPanel {
 					sb.append(lineAB + "\n");
 				}
 				String lineQC = areaQC.getAreaText();
-				String lineAC = areaAA.getAreaText();
+				String lineAC = areaAC.getAreaText();
 				if((!(lineQC.equals(""))) && (!(lineAC.equals("")))) {
 					sb.append("=" + lineQC + " -> ");
 					sb.append(lineAC + "\n");
